@@ -60,22 +60,22 @@ class SshClient{
   }
 
   private getConnection(){
-    File keyfile = new File( sshkey )
-    String keyfilePass = sshkeypass
+    File keyfile = sshkey? new File( sshkey ) : null
     Connection connection = new Connection( host, port ?: 22 )
     connection.connect()
-    boolean isAuthenticated = false
-    if ( !password ) {
+    boolean authenticated = false
+    if ( keyfile ) { //keyfile always preferred
       if ( LOG.debugEnabled )
         LOG.debug "Trying to open ssh session to $user @ $host : $port via keyfile $keyfile"
-      isAuthenticated = connection.authenticateWithPublicKey( user,
-              keyfile, keyfilePass )
-    } else {
+      authenticated = connection.authenticateWithPublicKey( user,
+              keyfile, sshkeypass )
+    }
+    if ( !authenticated ) {
       if ( LOG.debugEnabled )
         LOG.debug "Trying to open ssh session to $user @ $host : $port via password"
-      isAuthenticated = connection.authenticateWithPassword( user, password )
+      authenticated = connection.authenticateWithPassword( user, password )
     }
-    if ( !isAuthenticated )
+    if ( !authenticated )
       throw new IOException( "Authentication failed." )
     LOG.info "Connected to $user @ $host : $port "
     return connection
