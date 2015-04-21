@@ -59,6 +59,18 @@ class SshClient{
     }
   }
 
+  void putFile(  byte[] data, String name, String targetPath  ){
+    def connection = getConnection()
+    SCPClient scp = connection.createSCPClient()
+    if ( LOG.debugEnabled )
+      LOG.debug "Putting file to $host $targetPath / $name"
+    try{
+      scp.put( data, name, targetPath )
+    }finally {
+      connection.close()
+    }
+  }
+
   private getConnection(){
     File keyfile = sshkey? new File( sshkey ) : null
     Connection connection = new Connection( host, port ?: 22 )
