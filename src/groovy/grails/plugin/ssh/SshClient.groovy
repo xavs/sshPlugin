@@ -127,8 +127,9 @@ class SshClient{
         LOG.info "Connecting attempt $i / $retries"
         connection = new Connection( host, port ?: 22 )
         connection.connect()
+        break
       }catch( e ){
-        LOG.warn "Error connecting to $host $port"
+        LOG.warn "Error connecting to $host $port $e.message"
         if ( i < retries ) Thread.sleep( retryInterval )
         else throw e
       }
